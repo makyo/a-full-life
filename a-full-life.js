@@ -5,6 +5,18 @@ var aFullLife = (function() {
     {
       name: 'Normal',
       description: 'A well-balanced life',
+      innerDiameter: 1,
+      type: '',
+      fillers: [
+        { name: 'Physical health', value: 0.30, selected: false },
+        { name: 'Mental and emotional wellbeing', value: 0.30, selected: false },
+        { name: 'An established sense of identity', value: 0.20, selected: false },
+        { name: 'A drive to move forward and improve', value: 0.20, selected: false}
+      ]
+    },
+    {
+      name: 'Scheduling',
+      description: 'Making time for everything',
       innerDiameter: 1, // Percentage of outer diameter
       type: '',
       fillers: [
@@ -68,6 +80,17 @@ var aFullLife = (function() {
         { name: 'Living with misgendering and disbelief', value: 0.4, selected: false }
       ],
     },
+    {
+      name: 'Reality',
+      description: 'This is your life.  Live it to the fullest.',
+      innerDiameter: 1,
+      type: 'final',
+      fillers: [
+        { name: 'What it takes to make you happy', value: 0.30, selected: false },
+        { name: 'What it takes to keep you healthy', value: 0.30, selected: false },
+        { name: 'Everything you need to feel fulfilled', value: 0.40, selected: false }
+      ],
+    }
   ];
 
   game.currentLevel = window.location.hash ? 
@@ -191,6 +214,7 @@ var aFullLife = (function() {
         .delay(1001);
     });
   };
+
   game.draw = function() {
     var self = this;
     var level = this.levels[this.currentLevel];
@@ -203,6 +227,9 @@ var aFullLife = (function() {
     if (!this.identityNoteSeen && level.type === 'identity') {
       this.showNote('identity');
       this.identityNoteSeen = true;
+    }
+    if (level.type === 'final') {
+      this.showNote('final');
     }
     if (!this.instructionsSeen) {
       this.showNote('instructions');
@@ -359,6 +386,8 @@ var aFullLife = (function() {
         .transition()
         .attr('r', this.currentValue * 
           this.lifeCircleProperties.outerRadius)
+        .style('fill', Math.floor(this.currentValue * 100) === 100 ?
+            'lightblue' : 'white')
         .duration(1000);
       this.currentValueIndicator.select('text')
         .transition()

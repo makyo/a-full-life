@@ -23,7 +23,7 @@ h1, h2, h3, h4, h5, h6, svg .header {
     position: absolute;
     display: none;
     opacity: 0;
-    background-color: #fff;
+    background-color: lightblue;
 }
 
 .infoScreen div {
@@ -31,7 +31,7 @@ h1, h2, h3, h4, h5, h6, svg .header {
     padding: 5px;
 }
 
-.infoScreen h2 {
+.infoScreen h2, .infoscreen h3 {
     font-weight: 400;
 }
 
