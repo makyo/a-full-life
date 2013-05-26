@@ -17,6 +17,7 @@ h1, h2, h3, h4, h5, h6, svg .header {
 #game {
     border: 1px solid #eee;
     position: relative;
+    min-width: 1125px;
 }
 
 .infoScreen {
