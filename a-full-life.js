@@ -6,6 +6,7 @@ var aFullLife = (function() {
       name: 'Normal',
       description: 'A well-balanced life',
       innerDiameter: 1, // Percentage of outer diameter
+      type: '',
       fillers: [
         { name: 'Work', value: 0.24, selected: false },
         { name: 'Sleep', value: 0.33, selected: false },
@@ -18,6 +19,7 @@ var aFullLife = (function() {
       name: 'Clinical Depression',
       description: 'You have been diagnosed with clinical depression.',
       innerDiameter: 0.7, // Percentage of outer diameter
+      type: 'health',
       fillers: [
         { name: 'Feeling good about the work you do', value: 0.24, selected: false },
         { name: 'Sleeping well', value: 0.33, selected: false },
@@ -30,6 +32,7 @@ var aFullLife = (function() {
       name: 'Generalized Anxiety Disorder',
       description: 'You have been diagnosed with an anxiety disorder.',
       innerDiameter: 0.8, // Percentage of outer diameter
+      type: 'health',
       fillers: [
         { name: 'Obsessing over accomplishing tasks well', value: 0.44, selected: false },
         { name: 'Sleeping through the whole night', value: 0.33, selected: false },
@@ -42,6 +45,7 @@ var aFullLife = (function() {
       name: 'Homosexuality',
       description: 'You realize at an early age that you identify as homosexual',
       innerDiameter: 0.9,
+      type: 'identity',
       fillers: [
         { name: 'Feeling comfortable with your sexuality', value: 0.20, selected: false},
         { name: 'The acceptance of your parents', value: 0.30, selected: false },
@@ -54,7 +58,8 @@ var aFullLife = (function() {
       name: 'Gender Dysphoria',
       description: 'You realize early on that you do not feel comfortable with' +
         ' your birth sex.',
-      innerDiameter: 0.9,
+      innerDiameter: 0.8,
+      type: 'identity',
       fillers: [
         { name: 'Passing', value: 0.75, selected: false },
         { name: 'Affording Hormone Replacement Therapy', value: 0.4, selected: false },
@@ -74,14 +79,14 @@ var aFullLife = (function() {
   game.initialize = function() {
     this.el = document.getElementById('game');
     this.dimensions = [
-      this.el.clientWidth - 20,
-      document.documentElement.clientHeight - 240
+      Math.max(1125, this.el.clientWidth) - 20,
+      Math.max(600, document.documentElement.clientHeight) - 240
     ];
     this.vis = d3.select('#game')
       .append('svg')
       .attr({
-        width: Math.max(800, this.dimensions[0]) + 20,
-        height: Math.max(600, this.dimensions[1]) + 20
+        width: this.dimensions[0] + 20,
+        height: this.dimensions[1] + 20
       })
       .append('g')
       .attr('transform', 'translate(10,10)');
@@ -90,14 +95,14 @@ var aFullLife = (function() {
     this.fillerPanel = this.vis.append('g')
       .attr({
         'class': 'filler',
-        width: this.dimensions[0] - (this.dimensions[0] * 0.618),
+        width: Math.max(550, this.dimensions[0] - (this.dimensions[0] * 0.618)),
         height: this.dimensions[1] - 10,
         transform: 'translate(0,10)'
       });
     this.lifePanel = this.vis.append('g')
       .attr({
         'class': 'life',
-        width: this.dimensions[0] * 0.618,
+        width: Math.max(575, this.dimensions[0] * 0.618),
         height: this.dimensions[1] - 10,
         transform: 'translate(' + 
           (this.dimensions[0] - (this.dimensions[0] * 0.618)) + ',10)'
@@ -158,10 +163,51 @@ var aFullLife = (function() {
     this.draw();
   };
 
+  game.showNote = function(noteName) { 
+    var note = d3.select('#' + noteName);
+    note.style({
+      display: 'block',
+      top: noteName === 'instructions' ? 0 : (this.dimensions[1] / 2) + 'px',
+      left: 0
+    });
+    
+    note.select('.left')
+      .attr('style', 'float:left;width:' + (this.fillerPanel.attr('width') - 10) +
+          'px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
+    note.select('.right')
+      .attr('style', 'float:right;width:' + (this.lifePanel.attr('width') - 10) + 
+          'px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
+
+    note.transition()
+      .style('opacity', 0.9)
+      .duration(1000);
+
+    note.on('click',  function() {
+      note.transition()
+        .style('opacity', 0)
+        .duration(1000);
+      note.transition()
+        .style('display', 'none')
+        .delay(1001);
+    });
+  };
   game.draw = function() {
     var self = this;
     var level = this.levels[this.currentLevel];
     window.location.hash = this.currentLevel;
+    
+    if (!this.healthNoteSeen && level.type === 'health') {
+      this.showNote('health');
+      this.healthNoteSeen = true;
+    }
+    if (!this.identityNoteSeen && level.type === 'identity') {
+      this.showNote('identity');
+      this.identityNoteSeen = true;
+    }
+    if (!this.instructionsSeen) {
+      this.showNote('instructions');
+      this.instructionsSeen = true;
+    }
 
     // Draw the life circle.
     // First, calculate points and radii.
@@ -247,7 +293,7 @@ var aFullLife = (function() {
       .attr({
         cx: centerPoint[0],
         cy: centerPoint[1],
-        r: 0,
+        r: 1,
         'stroke-width': 1
       });
     this.currentValueIndicator.append('text')

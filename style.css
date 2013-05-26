@@ -12,11 +12,27 @@ h1, h2, h3, h4, h5, h6, svg .header {
 
 #header {
     height: 100px;
-    padding-top: 20px;
 }
 
 #game {
     border: 1px solid #eee;
+    position: relative;
+}
+
+.infoScreen {
+    position: absolute;
+    display: none;
+    opacity: 0;
+    background-color: #fff;
+}
+
+.infoScreen div {
+    margin: 0;
+    padding: 5px;
+}
+
+.infoScreen h2 {
+    font-weight: 400;
 }
 
 svg .header {
