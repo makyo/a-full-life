@@ -1,0 +1,50 @@
+body {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    padding: 0 10% 0 10%;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6, svg .header {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 100;
+}
+
+#header {
+    height: 100px;
+    padding-top: 20px;
+}
+
+#game {
+    border: 1px solid #eee;
+}
+
+svg .header {
+    font-size: 26px;
+}
+
+circle {
+    fill: none;
+    stroke: #888;
+}
+
+.fillerItem rect {
+    fill: #fff;
+    stroke: none;
+    opacity: 0.0;
+}
+
+.modalError {
+    fill: lightpink;
+    stroke: none;
+    opacity: 1;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+#copyright {
+    text-align: right;
+    height: 75px;
+}
