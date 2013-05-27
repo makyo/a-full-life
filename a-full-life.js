@@ -1,11 +1,18 @@
 var aFullLife = (function() {
   var game = {};
   
+  /*
+   * Levels
+   *
+   * Each level in the game has a name, a description, an inner diameter
+   * (used to represent a less-than-full life), a type, and various things
+   * that can be used to fill a life.
+   */
   game.levels = [
     {
       name: 'Normal',
       description: 'A well-balanced life',
-      innerDiameter: 1,
+      innerDiameter: 1, // Percentage of outer diameter
       type: '',
       fillers: [
         { name: 'Physical health', value: 0.30, selected: false },
@@ -17,7 +24,7 @@ var aFullLife = (function() {
     {
       name: 'Scheduling',
       description: 'Making time for everything',
-      innerDiameter: 1, // Percentage of outer diameter
+      innerDiameter: 1,
       type: '',
       fillers: [
         { name: 'Work', value: 0.24, selected: false },
@@ -30,7 +37,7 @@ var aFullLife = (function() {
     {
       name: 'Clinical Depression',
       description: 'You have been diagnosed with clinical depression.',
-      innerDiameter: 0.7, // Percentage of outer diameter
+      innerDiameter: 0.7,
       type: 'health',
       fillers: [
         { name: 'Feeling good about the work you do', value: 0.24, selected: false },
@@ -43,7 +50,7 @@ var aFullLife = (function() {
     {
       name: 'Generalized Anxiety Disorder',
       description: 'You have been diagnosed with an anxiety disorder.',
-      innerDiameter: 0.8, // Percentage of outer diameter
+      innerDiameter: 0.8,
       type: 'health',
       fillers: [
         { name: 'Obsessing over accomplishing tasks well', value: 0.44, selected: false },
@@ -77,7 +84,6 @@ var aFullLife = (function() {
         { name: 'Affording Hormone Replacement Therapy', value: 0.4, selected: false },
         { name: 'Deciding on surgery', value: 0.3, selected: false },
         { name: 'Explaining the difference between gender and sex', value: 0.15, selected: false },
-        { name: 'Living with misgendering and disbelief', value: 0.4, selected: false }
       ],
     },
     {
@@ -93,13 +99,25 @@ var aFullLife = (function() {
     }
   ];
 
-  game.currentLevel = window.location.hash ? 
+  // We can start on a level by using the hash portion of the URL, but only if we want.
+  game.useHash = false;
+  game.currentLevel = window.location.hash && game.useHash ? 
     parseInt(window.location.hash.split('#')[1], 10) : 0;
+
+  // Flags to say whether or not we've seen certain note/instruction screens.
   game.instructionsSeen = false;
   game.healthNoteSeen = false;
   game.identityNoteSeen = false;
 
+  /*
+   * Initialize
+   *
+   * This method builds up the SVG element in the correct dimensions, creating
+   * some grouping elements along the way that will be used in the drawing
+   * portion of the game.
+   */
   game.initialize = function() {
+    // Get the game element and build an SVG inside it.
     this.el = document.getElementById('game');
     this.dimensions = [
       Math.max(1125, this.el.clientWidth) - 20,
@@ -186,40 +204,19 @@ var aFullLife = (function() {
     this.draw();
   };
 
-  game.showNote = function(noteName) { 
-    var note = d3.select('#' + noteName);
-    note.style({
-      display: 'block',
-      top: noteName === 'instructions' ? 0 : (this.dimensions[1] / 2) + 'px',
-      left: 0
-    });
-    
-    note.select('.left')
-      .attr('style', 'float:left;width:' + (this.fillerPanel.attr('width') - 10) +
-          'px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
-    note.select('.right')
-      .attr('style', 'float:right;width:' + (this.lifePanel.attr('width') - 10) + 
-          'px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
-
-    note.transition()
-      .style('opacity', 0.9)
-      .duration(1000);
-
-    note.on('click',  function() {
-      note.transition()
-        .style('opacity', 0)
-        .duration(1000);
-      note.transition()
-        .style('display', 'none')
-        .delay(1001);
-    });
-  };
-
+  /*
+   * draw
+   *
+   * Draws one level of the game and attaches interactions.
+   */
   game.draw = function() {
     var self = this;
     var level = this.levels[this.currentLevel];
-    window.location.hash = this.currentLevel;
+    if (this.useHash) {
+      window.location.hash = this.currentLevel;
+    }
     
+    // Show notes if we need to.
     if (!this.healthNoteSeen && level.type === 'health') {
       this.showNote('health');
       this.healthNoteSeen = true;
@@ -256,11 +253,13 @@ var aFullLife = (function() {
       centerPoint: centerPoint
     };
 
+    // Set the title and description.
     this.lifePanel.select('.levelTitle')
       .text(level.name);
     this.lifePanel.select('.levelDescription')
       .text(level.description);
 
+    // Add the life-circle.
     this.life = this.lifePanel.append('circle')
       .attr({
         'class': 'lifeCircle clearable',
@@ -301,6 +300,7 @@ var aFullLife = (function() {
         return (d.value * fillerHeight) / 2;
       });
 
+    // This rect is what actually listens to the click events.
     fillerItem.append('rect')
       .attr({
         x: 0,
@@ -331,7 +331,7 @@ var aFullLife = (function() {
         'dominant-baseline': 'middle'
       });
 
-    // Draw the level selection controls.
+    // Display the level selection controls and add actions if need be.
     this.levelPanel.select('.currLevel').text(this.currentLevel);
     if (this.currentLevel === 0) {
       this.levelPanel.select('.prevLevel')
@@ -359,8 +359,16 @@ var aFullLife = (function() {
     }
   };
 
+  /*
+   * step
+   *
+   * Draw one step in the process of adding fillers to a life.
+   */
   game.step = function(el, datum) {
     var mustTransition = false;
+
+    // If we've already selected the item, deslect it.  Otherwise, make sure
+    // we can add the item (warn the user if not).
     if (datum.selected) {
       d3.select(el)
         .style('opacity', 0.0);
@@ -381,6 +389,7 @@ var aFullLife = (function() {
       }
     }
 
+    // If we need to change our current value indicator, do so with transitions.
     if (mustTransition) {
       this.currentValueIndicator.select('circle')
         .transition()
@@ -399,6 +408,47 @@ var aFullLife = (function() {
     }
   };
 
+  /*
+   * showNote
+   *
+   * This displays an overlay on top of the SVG.  It should contain divs
+   * classed 'left' and 'right' to fit over the filler and life panels
+   * respectively.
+   */
+  game.showNote = function(noteName) { 
+    var note = d3.select('#' + noteName);
+    note.style({
+      display: 'block',
+      top: noteName === 'instructions' ? 0 : (this.dimensions[1] / 2) + 'px',
+      left: 0
+    });
+    
+    note.select('.left')
+      .attr('style', 'float:left;width:' + (this.fillerPanel.attr('width') - 10) +
+          'px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
+    note.select('.right')
+      .attr('style', 'float:right;width:' + (this.lifePanel.attr('width') - 10) + 
+          'px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
+
+    note.transition()
+      .style('opacity', 0.9)
+      .duration(1000);
+
+    note.on('click',  function() {
+      note.transition()
+        .style('opacity', 0)
+        .duration(1000);
+      note.transition()
+        .style('display', 'none')
+        .delay(1001);
+    });
+  };
+
+  /*
+   * tooFullError
+   *
+   * Display an error if we cannot fit that filler into life.
+   */
   game.tooFullError = function() {
     var error = this.vis.append('g')
       .attr('class', 'clearable');
@@ -427,6 +477,11 @@ var aFullLife = (function() {
       .remove();
   };
 
+  /*
+   * clear
+   *
+   * Clear the SVG of all clearable items.
+   */
   game.clear = function() {
     this.vis.selectAll('.clearable')
       .remove();
