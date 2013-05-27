@@ -37,7 +37,7 @@ var aFullLife = (function() {
     {
       name: 'Clinical Depression',
       description: 'You have been diagnosed with clinical depression.',
-      innerDiameter: 0.7,
+      innerDiameter: 0.72,
       type: 'health',
       fillers: [
         { name: 'Feeling good about the work you do', value: 0.24, selected: false },
@@ -50,7 +50,7 @@ var aFullLife = (function() {
     {
       name: 'Generalized Anxiety Disorder',
       description: 'You have been diagnosed with an anxiety disorder.',
-      innerDiameter: 0.8,
+      innerDiameter: 0.82,
       type: 'health',
       fillers: [
         { name: 'Obsessing over accomplishing tasks well', value: 0.44, selected: false },
@@ -63,7 +63,7 @@ var aFullLife = (function() {
     {
       name: 'Homosexuality',
       description: 'You realize at an early age that you identify as homosexual',
-      innerDiameter: 0.9,
+      innerDiameter: 0.92,
       type: 'identity',
       fillers: [
         { name: 'Feeling comfortable with your sexuality', value: 0.20, selected: false},
@@ -77,7 +77,7 @@ var aFullLife = (function() {
       name: 'Gender Dysphoria',
       description: 'You realize early on that you do not feel comfortable with' +
         ' your birth sex.',
-      innerDiameter: 0.8,
+      innerDiameter: 0.72,
       type: 'identity',
       fillers: [
         { name: 'Passing', value: 0.75, selected: false },
