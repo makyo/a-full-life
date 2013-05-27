@@ -25,6 +25,7 @@ h1, h2, h3, h4, h5, h6, svg .header {
     display: none;
     opacity: 0;
     background-color: lightblue;
+    width: 100%
 }
 
 .infoScreen div {

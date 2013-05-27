@@ -80,7 +80,7 @@ var aFullLife = (function() {
       innerDiameter: 0.72,
       type: 'identity',
       fillers: [
-        { name: 'Passing', value: 0.75, selected: false },
+        { name: 'Passing', value: 0.70, selected: false },
         { name: 'Affording Hormone Replacement Therapy', value: 0.4, selected: false },
         { name: 'Deciding on surgery', value: 0.3, selected: false },
         { name: 'Explaining the difference between gender and sex', value: 0.15, selected: false },
@@ -424,8 +424,7 @@ var aFullLife = (function() {
     });
     
     note.select('.left')
-      .attr('style', 'float:left;width:' + (this.fillerPanel.attr('width') - 10) +
-          'px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
+      .attr('style', 'float:left;width:220px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
     note.select('.right')
       .attr('style', 'float:right;width:' + (this.lifePanel.attr('width') - 10) + 
           'px;height:' + (this.dimensions[1] / 2 - 10) + 'px');
@@ -483,6 +482,11 @@ var aFullLife = (function() {
    * Clear the SVG of all clearable items.
    */
   game.clear = function() {
+    this.levels.forEach(function(level) {
+      level.fillers.forEach(function(filler) {
+        filler.selected = false;
+      });
+    });
     this.vis.selectAll('.clearable')
       .remove();
   };
